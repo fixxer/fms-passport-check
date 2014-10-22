@@ -1,0 +1,43 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+      url "http://clojars.org/repo"
+    }
+  }
+  dependencies {
+    classpath "clojuresque:clojuresque:1.7.0"
+    classpath 'clojuresque:clojuresque-nrepl:1.2.0-SNAPSHOT'
+  }
+}
+
+ext {
+  aotCompile = true
+  warnOnReflection = false
+}
+
+allprojects {
+  apply plugin: 'clojure'
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    clojarsRepo()
+  }
+
+  dependencies {
+    compile 'org.clojure:clojure:1.6.+'
+    compile 'com.google.guava:guava:18.0'
+    compile 'org.apache.lucene:lucene-core:4.7.2'
+
+    development 'org.clojure:tools.nrepl:0.2.6'
+    development 'lein-light-nrepl:lein-light-nrepl:0.0.18'
+    development 'clojuresque:clojuresque-nrepl:1.2.0-SNAPSHOT'
+  }
+
+  clojureRepl {
+    port = '7888'
+    middleware = ['lighttable.nrepl.handler/lighttable-ops']
+  }
+}
