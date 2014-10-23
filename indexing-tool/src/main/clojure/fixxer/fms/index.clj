@@ -12,10 +12,19 @@
   "Create BloomFilter for byte[]"
   (BloomFilter/create (Funnels/byteArrayFunnel) 1000))
 
+(defn write-portion [file-name portion]
+  "Writes sorted portion into file"
+  (with-open [o (output-stream file-name)]
+    (doseq [passport portion]
+      (write (apply Util/packPassport pasport)))))
+
 (defn main [ & [file-name]]
   (with-open [rdr (clojure.java.io/reader file-name)
-              bloom-ostream (clojure.java.io/output-stream "bloom.txt")]
-    (let [bloom (create-bloom)]
-      (doseq [pasport (map parse-line (line-seq rdr))]
-        (.put bloom (apply Util/packPassport pasport)))
-      (.writeTo bloom bloom-ostream))))
+              bloom-ostream (clojure.java.io/output-stream "bloom.bin")]
+      (->> (line-seq rdr)
+           (map parse-line)
+           (partition 10000)
+           (map #(into (sorted-set) %))
+           (map vector (map #(str "segment-" % ".bin")
+                            (counter-seq)))
+           (apply write-portion))))
