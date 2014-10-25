@@ -26,5 +26,5 @@
            (partition 10000)
            (map #(into (sorted-set) %))
            (map vector (map #(str "segment-" % ".bin")
-                            (counter-seq)))
+                            (iterate inc 1)))
            (apply write-portion))))
