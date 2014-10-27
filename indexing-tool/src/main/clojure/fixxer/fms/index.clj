@@ -18,15 +18,17 @@
     (doseq [passport portion]
       (write (apply Util/packPassport pasport)))))
 
-(defn merge-sorted [acc fst snd]
-  "Merge two sorted vectors TODO: generalize for any type"
+(defn merge-sorted [acc fst snd cmp]
+  "Merge two sorted vectors"
   (cond
    (empty? fst) (into [] (concat acc snd))
    (empty? snd) (into [] (concat acc fst))
-   (< (first fst) (first snd))
-   (recur (conj acc (first fst)) (into [] (rest fst)) snd)
-   :else
-   (recur (conj acc (first snd)) fst (into [] (rest snd)))))
+   (< (cmp fst snd) 0) (recur (conj acc (first fst))
+                              (into [] (rest fst))
+                              snd)
+   :else (recur (conj acc (first snd))
+                fst
+                (into [] (rest snd)))))
 
 (defn main [ & [file-name]]
   (with-open [rdr (clojure.java.io/reader file-name)
