@@ -1,6 +1,7 @@
 (ns fixxer.fms.index
   (:import [com.google.common.hash BloomFilter Funnels]
            [fixxer.fms Util])
+  (:require [clojure.java.io :as io])
   (:gen-class))
 
 (defn parse-line [line]
@@ -14,7 +15,7 @@
 
 (defn write-portion [file-name portion]
   "Writes sorted portion into file"
-  (with-open [o (output-stream file-name)]
+  (with-open [o (io/output-stream file-name)]
     (doseq [passport portion]
       (write (apply Util/packPassport pasport)))))
 
@@ -31,8 +32,8 @@
                 (into [] (rest snd)))))
 
 (defn main [ & [file-name]]
-  (with-open [rdr (clojure.java.io/reader file-name)
-              bloom-ostream (clojure.java.io/output-stream "bloom.bin")]
+  (with-open [rdr (io/reader file-name)
+              bloom-ostream (io/output-stream "bloom.bin")]
       (->> (line-seq rdr)
            (map parse-line)
            (partition 10000)
