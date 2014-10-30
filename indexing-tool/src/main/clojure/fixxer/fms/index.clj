@@ -38,6 +38,5 @@
            (map parse-line)
            (partition 10000)
            (map #(into (sorted-set) %))
-           (map vector (map #(str "segment-" % ".bin")
-                            (iterate inc 1)))
+           (map-indexed (fn [idx portion] [(str "segment-" idx ".bin") portion]))
            (apply write-portion))))
