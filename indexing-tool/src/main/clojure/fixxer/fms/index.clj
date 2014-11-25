@@ -13,11 +13,14 @@
   "Create BloomFilter for byte[]"
   (BloomFilter/create (Funnels/byteArrayFunnel) 1000))
 
+(defn pack-passport [series number]
+  (Util/packPassport series number))
+
 (defn write-portion [file-name portion]
   "Writes sorted portion into file"
   (with-open [o (io/output-stream file-name)]
     (doseq [passport portion]
-      (write (apply Util/packPassport pasport)))))
+      (.write o (apply pack-passport (take 2 passport))))))
 
 (defn merge-sorted [acc fst snd cmp]
   "Merge two sorted vectors"
@@ -26,10 +29,12 @@
    (empty? snd) (into [] (concat acc fst))
    (< (cmp fst snd) 0) (recur (conj acc (first fst))
                               (into [] (rest fst))
-                              snd)
+                              snd
+                              cmp)
    :else (recur (conj acc (first snd))
                 fst
-                (into [] (rest snd)))))
+                (into [] (rest snd))
+                cmp)))
 
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
