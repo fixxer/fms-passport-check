@@ -17,7 +17,7 @@
   (Util/packPassport series number))
 
 (defn write-portion [file-name portion]
-  "Writes sorted portion into file"
+  "Writes portion into file"
   (with-open [o (io/output-stream file-name)]
     (doseq [passport portion]
       (.write o (apply pack-passport (take 2 passport))))))
