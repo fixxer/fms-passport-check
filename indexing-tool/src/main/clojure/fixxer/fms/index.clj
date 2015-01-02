@@ -36,6 +36,12 @@
                 (into [] (rest snd))
                 cmp)))
 
+(defn merge-files [file1-name file2-name]
+  "Merge two files"
+  (with-open [rdr1 (io/input-stream file1-name)
+              rdr2 (io/input-stream file2-name)]
+    ))
+
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
               bloom-ostream (io/output-stream "bloom.bin")]
