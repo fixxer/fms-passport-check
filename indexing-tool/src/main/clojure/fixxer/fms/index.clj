@@ -38,9 +38,13 @@
 
 (defn merge-files [file1-name file2-name]
   "Merge two files"
-  (with-open [rdr1 (io/input-stream file1-name)
-              rdr2 (io/input-stream file2-name)]
+  (with-open [is1 (io/input-stream file1-name)
+              is2 (io/input-stream file2-name)]
     ))
+
+(defn byte-seq [is]
+  "Create byte sequence from InputStream"
+  (cons (.read is) (lazy-seq (byte-seq is))))
 
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
