@@ -44,7 +44,9 @@
 
 (defn byte-seq [is]
   "Create byte sequence from InputStream"
-  (cons (.read is) (lazy-seq (byte-seq is))))
+  (let [the-byte (.read is)]
+    (cond (= the-byte -1) nil
+    :else (cons the-byte (lazy-seq (byte-seq is))))))
 
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
