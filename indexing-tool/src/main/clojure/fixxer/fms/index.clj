@@ -48,6 +48,21 @@
     (cond (= the-byte -1) nil
     :else (cons the-byte (lazy-seq (byte-seq is))))))
 
+(defn merged-seq [seq1 seq2 cmp]
+  "Merges two sorted sequences into lazy sequence"
+  (cond
+   (empty? seq1) seq2
+   (empty? seq2) seq1
+   :else
+   (let [h1 (first seq1) h2 (first seq2)]
+     (if (apply cmp [h1 h2])
+       (cons h1
+             (lazy-seq
+              (merged-seq (rest seq1) seq2 cmp)))
+       (cons h2
+             (lazy-seq
+              (merged-seq seq1 (rest seq2) cmp)))))))
+
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
               bloom-ostream (io/output-stream "bloom.bin")]
