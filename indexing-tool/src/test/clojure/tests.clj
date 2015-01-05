@@ -10,4 +10,4 @@
     (is (= (take 6 (byte-seq istream)) '(1 2 3 4 5)))))
 
 (deftest test-merged-seq1
-  (is (= (merged-seq [1 3] [2 4] <) (1 2 3 4))))
+  (is (= (merged-seq [1 3] [2 4] <) '(1 2 3 4))))
