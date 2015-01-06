@@ -5,6 +5,13 @@ import java.nio.ByteBuffer;
 public final class Util {
 
   /**
+   * Private default constructor prevents instantiation
+   */
+  private Util() {
+
+  }
+
+  /**
    * Pack passport series and number into 5 bytes
    */
   public static byte[] packPassport(int series, int number) {
