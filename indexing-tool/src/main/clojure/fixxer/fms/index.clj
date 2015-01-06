@@ -42,26 +42,21 @@
               is2 (io/input-stream file2-name)]
     ))
 
-(defn byte-seq [is]
+(defn byte-seq [istream]
   "Create byte sequence from InputStream"
-  (let [the-byte (.read is)]
+  (let [the-byte (.read istream)]
     (cond (= the-byte -1) nil
-    :else (cons the-byte (lazy-seq (byte-seq is))))))
+    :else (cons the-byte (lazy-seq (byte-seq istream))))))
 
-(defn merged-seq [seq1 seq2 cmp]
+(defn merged-seq [xs ys cmp]
   "Merges two sorted sequences into lazy sequence"
   (cond
-   (empty? seq1) seq2
-   (empty? seq2) seq1
-   :else
-   (let [h1 (first seq1) h2 (first seq2)]
-     (if (apply cmp [h1 h2])
-       (cons h1
-             (lazy-seq
-              (merged-seq (rest seq1) seq2 cmp)))
-       (cons h2
-             (lazy-seq
-              (merged-seq seq1 (rest seq2) cmp)))))))
+   (empty? xs) ys
+   (empty? ys) xs
+   :else (let [x (first xs) y (first ys)]
+     (if (apply cmp [x y])
+       (cons x (lazy-seq (merged-seq (rest xs) ys cmp)))
+       (cons y (lazy-seq (merged-seq xs (rest ys) cmp)))))))
 
 (defn partition-into-sorted-sets [n xs]
   "Partitions sequence `xs` into sorted sets size `n`"

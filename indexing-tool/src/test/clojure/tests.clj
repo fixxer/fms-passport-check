@@ -13,5 +13,5 @@
   (is (= (merged-seq [1 3] [2 4] <) '(1 2 3 4))))
 
 (deftest test-partition-into-sorted-sets
-  (is (= (partition-into-sorted-sets 2 [3 2 5 4 1 ])
+  (is (= (partition-into-sorted-sets 2 [3 2 5 4 1])
          '(#{2 3} #{4 5} #{1}))))
