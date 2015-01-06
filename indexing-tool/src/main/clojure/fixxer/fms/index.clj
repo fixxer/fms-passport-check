@@ -63,6 +63,11 @@
              (lazy-seq
               (merged-seq seq1 (rest seq2) cmp)))))))
 
+(defn partition-into-sorted-sets [n xs]
+  "Partitions sequence `xs` into sorted sets size `n`"
+  (let [into-sorted-set (fn [ys] (into (sorted-set) ys))]
+    (map into-sorted-set (partition n n [] xs))))
+
 (defn main [ & [file-name]]
   (with-open [rdr (io/reader file-name)
               bloom-ostream (io/output-stream "bloom.bin")]
