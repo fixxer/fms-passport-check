@@ -10,7 +10,7 @@
     (is (= (take 6 (byte-seq istream)) '(1 2 3 4 5)))))
 
 (deftest test-merged-seq1
-  (is (= (merged-seq [1 3] [2 4] <) '(1 2 3 4))))
+  (is (= (merged-seq [1 3] [2 4] compare) '(1 2 3 4))))
 
 (deftest test-partition-into-sorted-sets
   (is (= (partition-into-sorted-sets 2 [3 2 5 4 1])

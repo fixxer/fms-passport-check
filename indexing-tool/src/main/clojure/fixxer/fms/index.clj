@@ -54,7 +54,7 @@
    (empty? xs) ys
    (empty? ys) xs
    :else (let [x (first xs) y (first ys)]
-     (if (apply cmp [x y])
+     (if (< (apply cmp [x y]) 0)
        (cons x (lazy-seq (merged-seq (rest xs) ys cmp)))
        (cons y (lazy-seq (merged-seq xs (rest ys) cmp)))))))
 
@@ -64,8 +64,7 @@
     (map into-sorted-set (partition n n [] xs))))
 
 (defn main [ & [file-name]]
-  (with-open [rdr (io/reader file-name)
-              bloom-ostream (io/output-stream "bloom.bin")]
+  (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
            (map parse-line)
            (partition 10000)
