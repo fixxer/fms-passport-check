@@ -36,17 +36,11 @@
                 (into [] (rest snd))
                 cmp)))
 
-(defn merge-files [file1-name file2-name]
-  "Merge two files"
-  (with-open [is1 (io/input-stream file1-name)
-              is2 (io/input-stream file2-name)]
-    ))
-
 (defn byte-seq [istream]
   "Create byte sequence from InputStream"
-  (let [the-byte (.read istream)]
-    (cond (= the-byte -1) nil
-    :else (cons the-byte (lazy-seq (byte-seq istream))))))
+  (let [b (.read istream)]
+    (cond (= b -1) nil
+    :else (cons b (lazy-seq (byte-seq istream))))))
 
 (defn merged-seq [xs ys cmp]
   "Merges two sorted sequences into lazy sequence"
@@ -57,6 +51,17 @@
      (if (< (apply cmp [x y]) 0)
        (cons x (lazy-seq (merged-seq (rest xs) ys cmp)))
        (cons y (lazy-seq (merged-seq xs (rest ys) cmp)))))))
+
+(defn merge-files [file1-name file2-name out-file-name]
+  "Merge two sorted files"
+  (with-open [is1 (io/input-stream file1-name)
+              is2 (io/input-stream file2-name)
+              os (io/output-stream out-file-name)]
+    (doseq [e (merged-seq
+               (partition 5 (byte-seq is1))
+               (partition 5 (byte-seq is1))
+               compare)]
+      (.write os (byte-array 5 e)))))
 
 (defn partition-into-sorted-sets [n xs]
   "Partitions sequence `xs` into sorted sets size `n`"
