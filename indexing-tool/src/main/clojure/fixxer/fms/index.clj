@@ -52,16 +52,20 @@
        (cons x (lazy-seq (merged-seq (rest xs) ys cmp)))
        (cons y (lazy-seq (merged-seq xs (rest ys) cmp)))))))
 
+(defn merge-streams [istream1 istream2 ostream]
+  "Merge sorted 5-byte streams"
+  (doseq [e (merged-seq
+               (partition 5 (byte-seq istream1))
+               (partition 5 (byte-seq istream2))
+               compare)]
+      (.write ostream (byte-array 5 e))))
+
 (defn merge-files [file1-name file2-name out-file-name]
   "Merge two sorted files"
   (with-open [is1 (io/input-stream file1-name)
               is2 (io/input-stream file2-name)
               os (io/output-stream out-file-name)]
-    (doseq [e (merged-seq
-               (partition 5 (byte-seq is1))
-               (partition 5 (byte-seq is1))
-               compare)]
-      (.write os (byte-array 5 e)))))
+    (merge-streams is1 is2 os)))
 
 (defn partition-into-sorted-sets [n xs]
   "Partitions sequence `xs` into sorted sets size `n`"
@@ -72,7 +76,6 @@
   (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
            (map parse-line)
-           (partition 10000)
-           (map #(into (sorted-set) %))
+           (partition-into-sorted-sets 10000)
            (map-indexed (fn [idx portion] [(str "segment-" idx ".bin") portion]))
            (apply write-portion))))
