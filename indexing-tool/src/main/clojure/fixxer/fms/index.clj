@@ -1,8 +1,9 @@
 (ns fixxer.fms.index
   (:import [com.google.common.hash BloomFilter Funnels]
-           [fixxer.fms Util])
+           [fixxer.fms Util]
+           [java.nio ByteBuffer])
   (:require [clojure.java.io :as io])
-  (:gen-class))
+  (:gen-class :main true))
 
 (defn parse-line [line]
   "Get numbers from string"
@@ -14,7 +15,15 @@
   (BloomFilter/create (Funnels/byteArrayFunnel) 1000))
 
 (defn pack-passport [series number]
-  (Util/packPassport series number))
+  "Pack passport series and number into 5 bytes"
+  (let [int-to-byte-array (fn [n] (.. (ByteBuffer/allocate 4) (putInt series) array))
+        sbytes (int-to-byte-array series)
+        nbytes (int-to-byte-array number)]
+    (byte-array 5 [(aget sbytes 2)
+                   (aget sbytes 3)
+                   (aget nbytes 1)
+                   (aget nbytes 2)
+                   (aget nbytes 3)])))
 
 (defn write-portion [file-name portion]
   "Writes portion into file"
@@ -72,10 +81,10 @@
   (let [into-sorted-set (fn [ys] (into (sorted-set) ys))]
     (map into-sorted-set (partition n n [] xs))))
 
-(defn main [ & [file-name]]
+(defn -main [ & [file-name]]
   (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
            (map parse-line)
            (partition-into-sorted-sets 10000)
-           (map-indexed (fn [idx portion] [(str "segment-" idx ".bin") portion]))
+           (map-indexed (fn [idx part] [(str "segment-" idx ".bin") part]))
            (apply write-portion))))
