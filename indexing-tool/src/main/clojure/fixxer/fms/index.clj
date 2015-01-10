@@ -87,4 +87,4 @@
            (map parse-line)
            (partition-into-sorted-sets 10000)
            (map-indexed (fn [idx part] [(str "segment-" idx ".bin") part]))
-           (apply write-portion))))
+           (map #(apply write-portion %)))))
