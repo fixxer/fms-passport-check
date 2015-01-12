@@ -81,10 +81,17 @@
   (let [into-sorted-set (fn [ys] (into (sorted-set) ys))]
     (map into-sorted-set (partition n n [] xs))))
 
+(defn reduce-segments [[out-file in-file1] in-file2]
+  (do (merge-files in-file1 in-file2 out-file)
+    [in-file1 out-file]))
+
 (defn -main [ & [file-name]]
-  (with-open [rdr (io/reader file-name)]
+  (let [segments (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
            (map parse-line)
            (partition-into-sorted-sets 10000)
            (map-indexed (fn [idx part] [(str "segment-" idx ".bin") part]))
-           (map #(apply write-portion %)))))
+           (map (fn [[file-name data]]
+                  (do (write-portion file-name data)
+                    file-name)))))]
+    (reduce reduce-segments ["temp.bin" (first segments)] (last segments))))
