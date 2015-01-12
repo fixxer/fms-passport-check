@@ -12,12 +12,7 @@ buildscript {
   }
 }
 
-ext {
-  aotCompile = true
-  warnOnReflection = false
-}
-
-allprojects {
+subprojects {
   apply plugin: 'java'
   apply plugin: 'clojure'
 
@@ -30,11 +25,15 @@ allprojects {
   dependencies {
     compile 'org.clojure:clojure:1.6.+'
     compile 'com.google.guava:guava:18.0'
-    compile 'org.apache.lucene:lucene-core:4.7.2'
 
     development 'org.clojure:tools.nrepl:0.2.6'
     development 'lein-light-nrepl:lein-light-nrepl:0.0.18'
     development 'clojuresque:clojuresque-nrepl:1.2.0-SNAPSHOT'
+  }
+
+  compileClojure {
+    aotCompile = true
+    dependsOn compileJava
   }
 
   clojureRepl {
