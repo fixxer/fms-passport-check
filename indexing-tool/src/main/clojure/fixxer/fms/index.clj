@@ -85,6 +85,10 @@
   (do (merge-files in-file1 in-file2 out-file)
     [in-file1 out-file]))
 
+(defn sparse-index [n xs]
+  (map (fn [part] [(first part) part])
+       (partition n n [] xs)))
+
 (defn -main [ & [file-name]]
   (let [segments (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
