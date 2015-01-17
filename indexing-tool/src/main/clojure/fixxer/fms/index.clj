@@ -85,9 +85,11 @@
   (do (merge-files in-file1 in-file2 out-file)
     [in-file1 out-file]))
 
-(defn sparse-index [n xs]
-  (map (fn [part] [(first part) part])
-       (partition n n [] xs)))
+(defn sparse-index [n file-channel]
+  (let [buf (ByteBufer/wrap (byte-array 5))
+        bytes-read (.read file-channel buf n)]
+    (if (= bytes-read -1) nil
+      (cons [buf n] (lazy-seq (sparse-index n + 10000))))))
 
 (defn -main [ & [file-name]]
   (let [segments (with-open [rdr (io/reader file-name)]
