@@ -88,10 +88,10 @@
 (defn create-sparse-index-fn [sparse-factor]
   (fn [file-channel]
     (loop [n 0]
-    (let [buf (ByteBuffer/wrap (byte-array 5))
-        bytes-read (.read file-channel buf n)]
-    (if (= bytes-read -1) nil
-      (cons [buf n] (lazy-seq (recur (+ n sparse-factor)))))))))
+      (let [buf (ByteBuffer/wrap (byte-array 5))
+            bytes-read (.read file-channel buf n)]
+        (if (= bytes-read -1) nil
+          (cons [buf n] (lazy-seq (recur (+ n sparse-factor)))))))))
 
 (defn sparse-index [file-channel]
   ((create-sparse-index-fn 10000) file-channel))
