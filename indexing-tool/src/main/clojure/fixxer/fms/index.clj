@@ -93,8 +93,8 @@
         (if (= bytes-read -1) nil
           (cons [buf n] (lazy-seq (recur (+ n sparse-factor)))))))))
 
-(defn sparse-index [file-channel]
-  ((create-sparse-index-fn 10000) file-channel))
+(defn sparse-index [sparse-factor file-channel]
+  ((create-sparse-index-fn sparse-factor) file-channel))
 
 (defn -main [ & [file-name]]
   (let [segments (with-open [rdr (io/reader file-name)]
