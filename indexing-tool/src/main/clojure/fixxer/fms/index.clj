@@ -98,7 +98,7 @@
   ((create-sparse-index-fn sparse-factor) file-channel))
 
 (defn -main [ & [file-name]]
-  (let [segments (with-open [rdr (io/reader file-name)]
+  (sparse-index 100000 (let [segments (with-open [rdr (io/reader file-name)]
       (->> (line-seq rdr)
            (map parse-line)
            (partition-into-sorted-sets 10000)
@@ -106,4 +106,4 @@
            (map (fn [[file-name data]]
                   (do (write-portion file-name data)
                     file-name)))))]
-    (reduce reduce-segments ["temp.bin" (first segments)] (last segments))))
+    (reduce reduce-segments ["temp.bin" (first segments)] (last segments)))))
