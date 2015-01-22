@@ -98,12 +98,17 @@
   ((create-sparse-index-fn sparse-factor) file-channel))
 
 (defn -main [ & [file-name]]
-  (sparse-index 100000 (let [segments (with-open [rdr (io/reader file-name)]
-      (->> (line-seq rdr)
-           (map parse-line)
-           (partition-into-sorted-sets 10000)
-           (map-indexed (fn [idx part] [(str "segment-" idx ".bin") part]))
-           (map (fn [[file-name data]]
-                  (do (write-portion file-name data)
-                    file-name)))))]
-    (reduce reduce-segments ["temp.bin" (first segments)] (last segments)))))
+  (with-open [idx-stream
+              (io/input-stream
+               (first
+                (let [segments (with-open
+                                 [rdr (io/reader file-name)]
+                                 (->> (line-seq rdr)
+                                      (map parse-line)
+                                      (partition-into-sorted-sets 10000)
+                                      (map-indexed (fn [idx part] [(str "segment-" idx ".bin") part]))
+                                      (map (fn [[file-name data]]
+                                             (do (write-portion file-name data)
+                                               file-name)))))]
+                  (reduce reduce-segments ["temp.bin" (first segments)] (last segments)))))]
+    (sparse-index 10000 (getChannel. idx-stream))))
