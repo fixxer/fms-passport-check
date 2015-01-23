@@ -97,6 +97,11 @@
 (defn sparse-index [sparse-factor file-channel]
   ((create-sparse-index-fn sparse-factor) file-channel))
 
+(defn write-sparse-index [os idx]
+  (doseq [[data pos] idx]
+    (write. os data)
+    (write. os pos)))
+
 (defn -main [ & [file-name]]
   (with-open [idx-stream
               (io/input-stream
