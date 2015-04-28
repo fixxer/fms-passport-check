@@ -25,25 +25,15 @@
                    (aget nbytes 2)
                    (aget nbytes 3)])))
 
+(defn packed-passports [xs]
+  "Packed passport sequence"
+  (map (fn [x] (apply pack-passport (take 2 x)) xs)
+
 (defn write-portion [file-name portion]
   "Writes portion into file"
   (with-open [o (io/output-stream file-name)]
     (doseq [passport portion]
       (.write o (apply pack-passport (take 2 passport))))))
-
-(defn merge-sorted [acc fst snd cmp]
-  "Merge two sorted vectors"
-  (cond
-   (empty? fst) (into [] (concat acc snd))
-   (empty? snd) (into [] (concat acc fst))
-   (< (cmp fst snd) 0) (recur (conj acc (first fst))
-                              (into [] (rest fst))
-                              snd
-                              cmp)
-   :else (recur (conj acc (first snd))
-                fst
-                (into [] (rest snd))
-                cmp)))
 
 (defn byte-seq [istream]
   "Create byte sequence from InputStream"
@@ -61,29 +51,22 @@
        (cons x (lazy-seq (merged-seq (rest xs) ys cmp)))
        (cons y (lazy-seq (merged-seq xs (rest ys) cmp)))))))
 
-(defn merge-streams [istream1 istream2 ostream]
-  "Merge sorted 5-byte streams"
-  (doseq [e (merged-seq
-               (partition 5 (byte-seq istream1))
-               (partition 5 (byte-seq istream2))
-               compare)]
-      (.write ostream (byte-array 5 e))))
+(defn merge-passport-seq [xs ys]
+  "Merge sorted 5-byte sequences"
+  (merged-seq (partition 5 xs) (partition 5 ys) compare))
 
 (defn merge-files [file1-name file2-name out-file-name]
   "Merge two sorted files"
   (with-open [is1 (io/input-stream file1-name)
               is2 (io/input-stream file2-name)
               os (io/output-stream out-file-name)]
-    (merge-streams is1 is2 os)))
+    (doseq [x (merge-passport-seq is1 is2)]
+      (.write os (byte-array 5 x))))
 
 (defn partition-into-sorted-sets [n xs]
   "Partitions sequence `xs` into sorted sets size `n`"
   (let [into-sorted-set (fn [ys] (into (sorted-set) ys))]
     (map into-sorted-set (partition n n [] xs))))
-
-(defn reduce-segments [[out-file in-file1] in-file2]
-  (do (merge-files in-file1 in-file2 out-file)
-    [in-file1 out-file]))
 
 (defn create-sparse-index-fn [sparse-factor]
   (fn [file-channel]
