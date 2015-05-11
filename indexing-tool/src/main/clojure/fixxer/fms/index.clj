@@ -16,7 +16,7 @@
 
 (defn pack-passport [series number]
   "Pack passport series and number into 5 bytes"
-  (let [int-to-byte-array (fn [n] (.. (ByteBuffer/allocate 4) (putInt series) array))
+  (let [int-to-byte-array (fn [n] (.. (ByteBuffer/allocate 4) (putInt n) array))
         sbytes (int-to-byte-array series)
         nbytes (int-to-byte-array number)]
     (byte-array 5 [(aget sbytes 2)
