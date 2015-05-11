@@ -27,7 +27,7 @@
 
 (defn packed-passports [xs]
   "Packed passport sequence"
-  (map (fn [x] (apply pack-passport (take 2 x)) xs)
+  (map (fn [x] (apply pack-passport (take 2 x)) xs)))
 
 (defn write-portion [file-name portion]
   "Writes portion into file"
@@ -61,7 +61,7 @@
               is2 (io/input-stream file2-name)
               os (io/output-stream out-file-name)]
     (doseq [x (merge-passport-seq is1 is2)]
-      (.write os (byte-array 5 x))))
+      (.write os (byte-array 5 x)))))
 
 (defn partition-into-sorted-sets [n xs]
   "Partitions sequence `xs` into sorted sets size `n`"
@@ -82,8 +82,8 @@
 
 (defn write-sparse-index [os idx]
   (doseq [[data pos] idx]
-    (write. os data)
-    (write. os pos)))
+    (.write os data)
+    (.write os pos)))
 
 (defn -main [ & [file-name]]
   (with-open [idx-stream
@@ -98,5 +98,5 @@
                                       (map (fn [[file-name data]]
                                              (do (write-portion file-name data)
                                                file-name)))))]
-                  (reduce reduce-segments ["temp.bin" (first segments)] (last segments)))))]
-    (sparse-index 10000 (getChannel. idx-stream))))
+                  )))]
+    (sparse-index 10000 (.getChannel idx-stream))))
