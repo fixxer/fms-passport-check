@@ -1,6 +1,5 @@
 (ns fixxer.fms.index
   (:import [com.google.common.hash BloomFilter Funnels]
-           [fixxer.fms Util]
            [java.nio ByteBuffer])
   (:require [clojure.java.io :as io])
   (:gen-class :main true))
@@ -14,11 +13,14 @@
   "Create BloomFilter for byte[]"
   (BloomFilter/create (Funnels/byteArrayFunnel) 1000))
 
+(defn int->byte-array [n]
+  "Convert int to byte array"
+  (.. (ByteBuffer/allocate 4) (putInt n) array))
+
 (defn pack-passport [series number]
   "Pack passport series and number into 5 bytes"
-  (let [int-to-byte-array (fn [n] (.. (ByteBuffer/allocate 4) (putInt n) array))
-        sbytes (int-to-byte-array series)
-        nbytes (int-to-byte-array number)]
+  (let [sbytes (int->byte-array series)
+        nbytes (int->byte-array number)]
     (byte-array 5 [(aget sbytes 2)
                    (aget sbytes 3)
                    (aget nbytes 1)
